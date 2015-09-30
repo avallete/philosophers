@@ -1,0 +1,5 @@
+http://apais.developpez.com/tutoriels/c++/multithread/
+http://franckh.developpez.com/tutoriels/posix/pthreads/
+http://christophej.developpez.com/tutoriel/java/singleton/multithread/
+http://accu.org/index.php/journals/1584
+http://www.thegeekstuff.com/2012/03/linux-threads-intro/
