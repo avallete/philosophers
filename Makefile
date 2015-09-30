@@ -6,7 +6,7 @@
 #    By: avallete <avallete@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2015/01/17 11:43:55 by avallete          #+#    #+#              #
-#    Updated: 2015/08/28 14:38:46 by avallete         ###   ########.fr        #
+#    Updated: 2015/09/30 14:18:36 by avallete         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,6 +24,7 @@ SRC=$(addprefix $(SRC_PATH), $(SRC_NAME))
 OBJ=$(addprefix $(OBJ_PATH), $(OBJ_NAME))
 INCF=$(addprefix $(INC_PATH), $(INC_NAME))
 INC=$(addprefix -I, $(INC_PATH))
+LIB=-L libft/ -lftprintf
 CFLAGS=-Wall -Wextra -Werror -g
 CC=gcc
 NAME=philo
@@ -38,7 +39,8 @@ all: $(NAME)
 
 $(NAME):$(OBJ)
 	@echo "${GREEN}Compile $(NAME) with $(CFLAGS)${NC}";
-	@$(CC) $(CFLAGS) $(INC) $(OBJ) -o $(NAME);
+	@make -C libft
+	@$(CC) $(CFLAGS) $(INC) $(LIB) $(OBJ) -o $(NAME);
 
 $(OBJ_PATH)%.o: $(SRC_PATH)%.c
 	@mkdir -p $(OBJ_PATH)

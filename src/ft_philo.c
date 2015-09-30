@@ -1,36 +1,17 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <pthread.h>
+#include "ft_philo.h"
  
-// Let us create a global variable to change it in threads
-int g = 0;
- 
-// The function to be executed by all threads
-void *myThreadFun(void *vargp)
+void check_constant_errors(void)
 {
-    // Store the value argument passed to this thread
-    int myid = *(int*)vargp;
- 
-    // Let us create a static variable to observe its changes
-    static int s = 0;
- 
-    // Change static and global variables
-    ++s; ++g;
- 
-    // Print the argument, static and global variables
-    printf("Thread ID: %d, Static: %d, Global: %d\n", myid, ++s, ++g);
-    return &g;
+    if (MAX_LIFE < 1 || EAT_T < 1 || THINK_T < 1 || TIMEOUT < 1)
+    {
+        ft_puterrdl("The constants variables must be greater than 0");
+        exit(-1);
+    }
 }
- 
+
 int main()
 {
-    int i;
-    pthread_t tid;
- 
-    // Let us create three threads
-    for (i = 0; i < 3; i++)
-        pthread_create(&tid, NULL, myThreadFun, &i);
+    check_constant_errors();
     
-    pthread_exit(NULL);
     return 0; 
 }
