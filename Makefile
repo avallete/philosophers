@@ -11,7 +11,8 @@
 # **************************************************************************** #
 
 SRC_PATH=./src/
-SRC_NAME=ft_philo.c
+SRC_NAME=	ft_philo.c\
+			init_functions.c
 OBJ_PATH =./obj/
 OBJ_NAME=$(SRC_NAME:.c=.o)
 INC_PATH=./includes/
