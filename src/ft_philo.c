@@ -30,19 +30,19 @@ void	*play(void* data)
 
 	p = (t_philo*)data;
 	sides[0] = g_chopstiks[p->id];
-	sides[1] = g_chopstiks[((p->id + 1) % NUMBERPHILO)];
-	sides[2] = g_chopstiks[((p->id - 1) % NUMBERPHILO)];
+	sides[1] = g_chopstiks[take_right(p->id)];
+	sides[2] = g_chopstiks[take_left(p->id)];
 	pthread_mutex_lock(&g_printlock);
 	ft_printf("The philosophe number: %d, seat to table.\n", p->id);
-	ft_printf("Philosophe %d have: %d, r: %d, l: %d\n", p->id, sides[0], sides[1], sides[2]);
-	pthread_mutex_lock(&g_guest[((p->id + 1) % NUMBERPHILO)].lock);
-	ft_printf("Philo: %d , The right philosopher is : %d, The left is %d \n", p->id, take_right(p->id), take_left(p->id));
-	pthread_mutex_unlock(&g_guest[((p->id + 1) % NUMBERPHILO)].lock);
 	pthread_mutex_unlock(&g_printlock);
 	while (p->life > 0)
 	{
 		pthread_mutex_lock(&p->lock);
 		p->life--;
+		pthread_mutex_lock(&g_printlock);
+		ft_printf("The philosophe number: %d, have %d restant life.\n", p->id, p->life);
+		pthread_mutex_unlock(&g_printlock);
+		usleep(IN_SEC(1));
 		pthread_mutex_unlock(&p->lock);
 	}
 	return NULL;
@@ -82,6 +82,21 @@ void	wait_everyone(void *data)
     }
 }
 
+void	end_threads(void *data)
+{
+	int i;
+	t_philo *guest;
+
+	i = 0;
+	guest = (t_philo*)data;
+	while (i < NUMBERPHILO)
+    {
+      	pthread_detach(guest[i].thread);
+      	i++;
+    }
+    ft_printf("Now, it is time... To DAAAAAAAANCE!!!\n");
+}
+
 int main()
 {
 	int i;
@@ -89,6 +104,8 @@ int main()
 	i = 0;
     check_constant_errors();
     init_philosophe(&g_guest);
+    usleep(IN_SEC(TIMEOUT));
+    end_threads(&g_guest);
     wait_everyone(&g_guest);
     return 0; 
 }

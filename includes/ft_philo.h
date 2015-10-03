@@ -6,11 +6,11 @@
 #define EAT 1
 #define REST 2
 #define THINK 3
-#define MAX_LIFE 10
+#define MAX_LIFE 80
 #define EAT_T 1
 #define REST_T 1
 #define THINK_T 1
-#define TIMEOUT 60
+#define TIMEOUT 10
 #define NUMBERPHILO 7
 #define IN_SEC(x) ((x * 1000000))
 
