@@ -12,7 +12,7 @@
 #define THINK_T 1
 #define TIMEOUT 60
 #define NUMBERPHILO 7
-#define IN_SEC(x) ((x * 100000))
+#define IN_SEC(x) ((x * 1000000))
 
 typedef struct		s_philo
 {
