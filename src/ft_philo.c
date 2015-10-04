@@ -69,34 +69,42 @@ void	resting(t_philo *p)
 
 	i = 0;
 	pthread_mutex_unlock(&g_chop.choplock[p->id]);
-	pthread_mutex_lock(&g_termlock);
-	ft_printf("\e[%dmThe philosophe number: %d, begin to rest.\e[0m Time: %d\n", p->color, p->id, time(NULL));
-	pthread_mutex_unlock(&g_termlock);
-	change_state(REST, p->history, p);
-	while (i < REST_T && p->life > 0)
+	take_chopstick(p->id, take_right(p->id));
+	take_chopstick(p->id, take_left(p->id));
+	if (g_chop.chopsticks[p->id] == 0)
 	{
-		p->life--;
-		usleep(IN_SEC(1));
-		i++;
+		pthread_mutex_lock(&g_termlock);
+		ft_printf("\e[%dmThe philosophe number: %d, begin to rest.\e[0m Time: %d\n", p->color, p->id, time(NULL));
+		pthread_mutex_unlock(&g_termlock);
+		change_state(REST, p->history, p);
+		while (i < REST_T && p->life > 0)
+		{
+			p->life--;
+			usleep(IN_SEC(1));
+			i++;
+		}
+		pthread_mutex_lock(&g_termlock);
+		ft_printf("\e[%dmThe philosophe number: %d, finish to rest.\e[0m Time: %d\n", p->color, p->id, time(NULL));
+		pthread_mutex_unlock(&g_termlock);
 	}
-	pthread_mutex_lock(&g_termlock);
-	ft_printf("\e[%dmThe philosophe number: %d, finish to rest.\e[0m Time: %d\n", p->color, p->id, time(NULL));
-	pthread_mutex_unlock(&g_termlock);
 }
 
 void	eating(t_philo *p)
 {	
-	change_state(EAT, p->history, p);
-	pthread_mutex_lock(&g_chop.choplock[p->id]);
-	pthread_mutex_lock(&g_termlock);
-	ft_printf("\e[%dmThe philosophe number: %d, begin to eat.\e[0m Time: %d\n", p->color, p->id, time(NULL));
-	pthread_mutex_unlock(&g_termlock);
-	usleep(IN_SEC(EAT_T));
-	p->life = MAX_LIFE;
-	pthread_mutex_lock(&g_termlock);
-	ft_printf("\e[%dmThe philosophe number: %d, finished to eat.\e[0m Time: %d\n", p->color, p->id, time(NULL));
-	pthread_mutex_unlock(&g_termlock);
-	resting(p);
+	if (g_chop.chopsticks[p->id] == 2)
+	{
+		change_state(EAT, p->history, p);
+		pthread_mutex_lock(&g_chop.choplock[p->id]);
+		pthread_mutex_lock(&g_termlock);
+		ft_printf("\e[%dmThe philosophe number: %d, begin to eat.\e[0m Time: %d\n", p->color, p->id, time(NULL));
+		pthread_mutex_unlock(&g_termlock);
+		usleep(IN_SEC(EAT_T));
+		p->life = MAX_LIFE;
+		pthread_mutex_lock(&g_termlock);
+		ft_printf("\e[%dmThe philosophe number: %d, finished to eat.\e[0m Time: %d\n", p->color, p->id, time(NULL));
+		pthread_mutex_unlock(&g_termlock);
+		resting(p);
+	}
 }
 
 void	thinking(t_philo *p)
@@ -104,19 +112,23 @@ void	thinking(t_philo *p)
 	int i;
 
 	i = 0;
-	change_state(THINK, p->history, p);
-	pthread_mutex_lock(&g_termlock);
-	ft_printf("\e[%dmThe philosophe number: %d, begin to think.\e[0m Time: %d\n", p->color, p->id, time(NULL));
-	pthread_mutex_unlock(&g_termlock);
-	while (i < THINK_T && p->life > 0)
+	if (g_chop.chopsticks[p->id] == 1)
 	{
-		p->life--;
-		usleep(IN_SEC(1));
-		i++;
+		change_state(THINK, p->history, p);
+		pthread_mutex_lock(&g_termlock);
+		ft_printf("\e[%dmThe philosophe number: %d, begin to think.\e[0m Time: %d\n", p->color, p->id, time(NULL));
+		pthread_mutex_unlock(&g_termlock);
+		pthread_mutex_unlock(&g_chop.choplock[p->id]);
+		while (i < THINK_T && p->life > 0)
+		{
+			p->life--;
+			usleep(IN_SEC(1));
+			i++;
+		}
+		pthread_mutex_lock(&g_termlock);
+		ft_printf("\e[%dmThe philosophe number: %d, finish to think.\e[0m Time: %d\n", p->color, p->id, time(NULL));
+		pthread_mutex_unlock(&g_termlock);
 	}
-	pthread_mutex_lock(&g_termlock);
-	ft_printf("\e[%dmThe philosophe number: %d, finish to think.\e[0m Time: %d\n", p->color, p->id, time(NULL));
-	pthread_mutex_unlock(&g_termlock);
 }
 
 
@@ -161,10 +173,12 @@ void	*play(void* data)
 	while (p->life > 0)
 	{
 		pthread_mutex_lock(&p->lock);
-		if (p->state != EAT && get_chopstick(p->id) == 1 && get_chopstick(take_right(p->id) > 0))
+		if (p->state != EAT && p->life < MAX_LIFE)
+		{
+			if (get_chopstick(p->id) == 1)
 				take_chopstick(take_right(p->id), p->id);
-		if (p->state != EAT && get_chopstick(p->id) == 2)
 			eating(p);
+		}
 		else if (p->state != THINK && get_chopstick(p->id) == 1)
 			thinking(p);
 		else
